@@ -1,41 +1,42 @@
-// Artboards_Rotate_With_Objects.jsx for Adobe Illustrator
-// Description: Script to rotate 90 degrees an document artboards with all the objects on it.
-// Requirements: Adobe Illustrator CS6 and above
-// Date: October, 2018
-// Authors: Alexander Ladygin, email: i@ladygin.pro
+// 将对象随画板旋转.jsx 适用于Ai。
+// 秒数: 用来90度旋转画板上所有对象的脚本。
+// 要求: Ai CS 6 及以上。
+// 日期: 2018年10月。
+// 作者: Alexander Ladygin, email: i@ladygin.pro
 //          Sergey Osokin, email: hi@sergosokin.ru
 // ============================================================================
-// Installation:
-// 1. Place script in:
-//    Win (32 bit): C:\Program Files (x86)\Adobe\Adobe Illustrator [vers.]\Presets\en_GB\Scripts\
-//    Win (64 bit): C:\Program Files\Adobe\Adobe Illustrator [vers.] (64 Bit)\Presets\en_GB\Scripts\
-//    Mac OS: <hard drive>/Applications/Adobe Illustrator [vers.]/Presets.localized/en_GB/Scripts
-// 2. Restart Illustrator
-// 3. Choose File > Scripts > Artboards_Rotate_With_Objects
+// 安装:
+// 1. 将脚本放至在:
+//    Win (32 位): C:\Program Files (x86)\Adobe\Adobe Illustrator [版本号]\Presets\zh_CN\脚本\
+//    Win (64 位): C:\Program Files\Adobe\Adobe Illustrator [版本号] (64 Bit)\Presets\zh_CN\脚本\
+//    Mac OS: <hard drive>/Applications/Adobe Illustrator [版本号]/Presets.localized/zh_CN/脚本
+// 2. 重启Ai。
+// 3. 选择 文件 > 脚本 > 将对象随画板旋转 。
 // ============================================================================
-// Versions:
-// 0.1 Initial version. Do not rotate locked, hidden items
-// 1.0 Added GUI: the choice of current artboard or all. Now script can rotate locked, hidden objects
-// 1.1 Added rotate angle: 90 CW or 90 CCW.
-// 1.2 Fix issues.
+// 版本:
+// 0.1 最初的版本。不能旋转锁定、隐藏项目。
+// 1.0 增加图形用户界面: 选择当前画板或全部选择. 新脚本可以旋转锁定、隐藏项目。
+// 1.1 增加旋转角度：90 CW或90 CCW。
+// 1.2 问题修正。
 // ============================================================================
-// Donate (optional): If you find this script helpful and want to support me 
-// by shouting me a cup of coffee, you can by via PayPal http://www.paypal.me/osokin/usd
+// 如果你认为本脚本很实用, 可以给原作者通过PayPal或Yandex Money买杯咖啡。 ☕️ 
+//    http://www.paypal.me/osokin/usd
+//    https://money.yandex.ru/to/410011149615582
 // ============================================================================
-// NOTICE:
-// Tested with Adobe Illustrator CC 2017/2018 (Mac), CS6 (Win).
-// This script is provided "as is" without warranty of any kind.
-// Free to use, not for sale.
+// 注意：
+// 使用Ai CC 2017/2018 (Mac), CS6 (Win)进行测试。
+// 此脚本按照现状提供，没有任何口头/书面保证。
+// 授予个人非商业使用许可。
 // ============================================================================
-// Released under the MIT license.
+// 在MIT许可的情况下进行授权。
 // http://opensource.org/licenses/mit-license.php
 // ============================================================================
-// Check other author's scripts: https://github.com/creold
+// 查看作者的其他脚本: https://github.com/creold
 
 //@target illustrator
 app.userInteractionLevel = UserInteractionLevel.DONTDISPLAYALERTS;
 
-var SCRIPT_NAME = 'ARWO',
+var SCRIPT_NAME = '将对象随画板旋转',
     SCRIPT_VERSION = 'v.1.2';
 
 try {
@@ -52,31 +53,31 @@ try {
         dlg.alignChildren = ['fill', 'fill'];
 
         // Target radiobutton
-        var slctTarget = dlg.add('panel', undefined, 'What to rotate?');
+        var slctTarget = dlg.add('panel', undefined, '需要旋转？');
         slctTarget.orientation = 'column';
         slctTarget.alignChildren = 'left';
         slctTarget.margins = [10,20,10,10];
-        var currArtRadio = slctTarget.add('radiobutton', undefined, 'Active Artboard #' + currArtNum),
-            allArtRadio = slctTarget.add('radiobutton', undefined, 'All ' + doc.artboards.length + ' Artboards');
+        var currArtRadio = slctTarget.add('radiobutton', undefined, '选择画板#' + currArtNum),
+            allArtRadio = slctTarget.add('radiobutton', undefined, '全部选择 ' + doc.artboards.length + ' 个画板');
         currArtRadio.value = true;
 
         // Angle radiobutton
-        var slctAngle = dlg.add('panel', undefined, 'Rotation angle');
+        var slctAngle = dlg.add('panel', undefined, '旋转角度');
         slctAngle.orientation = 'row';
         slctAngle.alignChildren = ['fill', 'fill'];
         slctAngle.margins = [10,20,10,10];
-        var cwAngle = slctAngle.add('radiobutton', undefined, '90 CW'),
-            ccwAngle = slctAngle.add('radiobutton', undefined, '90 CCW');
+        var cwAngle = slctAngle.add('radiobutton', undefined, '顺时针90度'),
+            ccwAngle = slctAngle.add('radiobutton', undefined, '逆时针90度');
         cwAngle.value = true;
 
         // Buttons
         var btns = dlg.add('group');
         btns.alignChildren = ['fill', 'fill'];
         btns.margins = [0, 10, 0, 0];
-        var cancel = btns.add('button', undefined, 'Cancel', {name: 'cancel'});
-        cancel.helpTip = 'Press Esc to Close';
-        var ok = btns.add('button', undefined, 'OK', {name: 'ok'});
-        ok.helpTip = 'Press Enter to Run';
+        var cancel = btns.add('button', undefined, '取消', {name: 'cancel'});
+        cancel.helpTip = '轻按esc键以取消';
+        var ok = btns.add('button', undefined, '确定', {name: 'ok'});
+        ok.helpTip = '轻按回车以继续';
         ok.active = true;
         cancel.onClick = function () { dlg.close(); }
         ok.onClick = okClick;
@@ -110,7 +111,7 @@ try {
             dlg.close();
         }
     } else {
-        throw new Error(scriptName + '\nPlease open a document before running this script.');
+        throw new Error(scriptName + '\n请在运行此脚本前打开一个文件。');
     }
 } catch (e) {
     showError(e);
@@ -188,8 +189,8 @@ function deselect() {
 }
 
 function showError(err) {
-    if (confirm(scriptName + ': an unknown error has occurred.\n' +
-        'Would you like to see more information?', true, 'Unknown Error')) {
-        alert(err + ': on line ' + err.line, 'Script Error', true);
+    if (confirm(scriptName + ': 发生了一个未知的错误。\n' +
+        '您想看更多信息吗？', true, '未知错误')) {
+        alert(err + ': 位于' + err.line, '脚本错误', true);
     }
 }
